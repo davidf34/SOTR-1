@@ -52,6 +52,7 @@ int ball_x;
 int ball_y;
 int H = 128,V = 64;
 int bandera_x=0, bandera_y=0;
+int LeftRaqX = 6, LeftRaqY = 20, RightRaqX = 117, RightRaqY = 18;
 
 
 
@@ -92,16 +93,15 @@ void FuncionTarea1(){
 	ball_y = 32;
 	
 	
-	/*pelooota*/
+	//Ball
 	
 	for(i = ball_x; i < ball_x+3; i++){
 		for(j= ball_y; j < ball_y+3; j++){
 		LCD1_PutPixel(i,j,TRUE); 
 		}
 	}
-	//////////////////
 	
-	
+	// Zone
 	for (i = 0;i<H;i++){
 		for(j = 0 ; j < V; j++){
 			if( i == 1 || i == H - 3 || j == 1 || j == V-3){
@@ -110,55 +110,81 @@ void FuncionTarea1(){
 		}
 	}
 	
-	
-	for (j = 4 ; j < 7; j++){
-			for(i = 24;i<39;i++){			
-				LCD1_PutPixel(j,i,TRUE);
-				
-			}
+	//Left
+	for (i = LeftRaqX ; i < LeftRaqX + 3; i++)
+	{
+		for(j = LeftRaqY; j < LeftRaqY + 15; j++)
+		{			
+			LCD1_PutPixel(i,j,TRUE);	
 		}
-		
-	for (j = 123 ; j < 126; j++){
-				for(i = 24;i<39;i++){			
-					LCD1_PutPixel(j,i,TRUE);
-					
-				}
-			}
+	}
+	
+	//Right
+	for (i = RightRaqX ; i < RightRaqX + 3; i++)
+	{
+		for(j = RightRaqY; j < RightRaqY +15; j++)
+		{			
+			LCD1_PutPixel(i,j,TRUE);
+		}
+	}
 
 	LCD1_UpdateFull();
-	//posicion(&ball_x,&ball_y,V,H,&dx,&dy);
-	
 	
 	while(1){
 		bandera_x = ball_x;
 		bandera_y = ball_y;
+		
 		//Verificación
-		if(ball_y == 1 || ball_y == V-3)
+		if(ball_y == 2 || ball_y == V-6)
 		{
 			dy *= -1;
 		}
 		
-		if(ball_x == 1 || ball_x == H-3)
+		if(ball_x == 2 || ball_x == H-6)
 		{
 			dx *= -1;
 		}
-		//Modificar
+		
+		if(ball_x == LeftRaqX + 3)
+		{
+			if((ball_y + 1) >= LeftRaqY && (ball_y+1) < (LeftRaqY + 8))
+			{
+				dx = 1;
+				dy = -1;
+			}else if((ball_y+1) == (LeftRaqY + 8))
+			{
+				dx = 1;
+				dy = 0;
+			}
+			else if((ball_y+1) >= (LeftRaqY + 9) && (ball_y+1) < LeftRaqY + 15)
+			{
+				dx = 1;
+				dy = 1;
+			}
+		}
+		
+		if(ball_x == RightRaqX - 3)
+		{
+			if(ball_y >= RightRaqY && ball_y < (RightRaqY + 15))
+			{
+				dx *= -1;
+			}
+		}
+		
+		
+		//Modificación
 		ball_x += (dx);
 		ball_y += (dy);
 		
-		LCD1_PutPixel(ball_x,ball_y,TRUE);
-	
+		//Draw ball by (x,y)
 		if(dx == -1 && dy == -1)
 		{
-			for(i = ball_x; i<=(bandera_x+3); i++)
+			for(i = ball_x; i<=(bandera_x+2); i++)
 			{
-				for(j= ball_y; j<=(bandera_y+3); j++){
-					if(i < ball_x + 2 && i >= ball_x)
+				for(j= ball_y; j<=(bandera_y+2); j++){
+					if(i <= ball_x + 2 &&  j <= ball_y + 2)
 					{
-						if(j < ball_y + 2)
-						{
 							LCD1_PutPixel(i,j,TRUE);
-						}
 					}
 					else {
 						LCD1_PutPixel(i,j,FALSE);
@@ -168,9 +194,9 @@ void FuncionTarea1(){
 			}
 		}else if(dx == -1 && dy == 1)
 		{
-			for(i = ball_x; i<=(bandera_x+3); i++)
+			for(i = ball_x; i<=(bandera_x+2); i++)
 			{
-				for(j= bandera_y; j<=(ball_y+3); j++){
+				for(j= bandera_y; j<=(ball_y+2); j++){
 					if(i <= ball_x + 2  && j <= ball_y + 2 && j >= ball_y)
 					{
 						LCD1_PutPixel(i,j,TRUE);	
@@ -182,10 +208,55 @@ void FuncionTarea1(){
 			}
 		}else if(dx == 1 && dy == 1)
 		{
-			for(i = bandera_x; i<=(ball_x+3); i++)
+			for(i = bandera_x; i<=(ball_x+2); i++)
 			{
-				for(j= bandera_y; j<=(ball_y+3); j++){
+				for(j= bandera_y; j<=(ball_y+2); j++){
 					if(i >= ball_x && j >= ball_y)
+					{
+						LCD1_PutPixel(i,j,TRUE);	
+					}
+					else {
+						LCD1_PutPixel(i,j,FALSE);
+					}
+				}
+			}
+		}else if(dx == 1 && dy == -1 )
+		{
+			for(i = bandera_x; i<=(ball_x+2); i++)
+			{
+				for(j= ball_y; j<=(bandera_y+2); j++)
+				{
+					if(i >= ball_x && j >= ball_y && j <= ball_y+2)
+					{
+						LCD1_PutPixel(i,j,TRUE);	
+					}
+					else {
+						LCD1_PutPixel(i,j,FALSE);
+					}
+				}
+			}
+		}else if(dx == 1 && dy == 0)
+		{
+			for(i = bandera_x; i<=(ball_x+2); i++)
+			{
+				for(j= ball_y; j<=(bandera_y+2); j++)
+				{
+					if(i >= ball_x && i<=ball_x+2 && j <= ball_y+2)
+					{
+						LCD1_PutPixel(i,j,TRUE);	
+					}
+					else {
+						LCD1_PutPixel(i,j,FALSE);
+					}
+				}
+			}
+		}else if(dx == -1 && dy == 0)
+		{
+			for(i = ball_x; i<=(bandera_x+2); i++)
+			{
+				for(j= ball_y; j<=(bandera_y+2); j++)
+				{
+					if(i >= ball_x && i<=ball_x+2 && j <= ball_y+2)
 					{
 						LCD1_PutPixel(i,j,TRUE);	
 					}
