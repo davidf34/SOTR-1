@@ -28,6 +28,7 @@
 
 
 /* Including needed modules to compile this module/procedure */
+
 #include "Cpu.h"
 #include "Events.h"
 #include "LCD1.h"
@@ -50,17 +51,29 @@ int i;
 int j;
 int ball_x;
 int ball_y;
+char a;
 int H = 128,V = 64;
 int bandera_x=0, bandera_y=0;
-int LeftRaqX = 6, LeftRaqY = 20, RightRaqX = 117, RightRaqY = 18;
-
+int count_1 = 0, count_2 = 0;
+//posicion de raquetas
+//6-24
+int LeftRaqX = 6, LeftRaqY = 10, RightRaqX = 117, RightRaqY = 40;
+int jugador1,jugador2, acumulador1, acumulador2;
+char punt1, punt2;
 
 
 void FuncionTarea1();
 void ball();
-void posicion();
+char IntToChar1(int N);
+char IntToChar2(int N);
+void puntaje();
 /* User includes (#include below this line is not maintained by Processor Expert) */
-
+char IntToChar1(int N1){
+	return N1+'0';
+}
+char IntToChar2(int N2){
+	return N2+'0';
+}
 void main(void)
 {
   /* Write your local variable definition here */
@@ -110,7 +123,7 @@ void FuncionTarea1(){
 		}
 	}
 	
-	//Left
+	//LeftRaq
 	for (i = LeftRaqX ; i < LeftRaqX + 3; i++)
 	{
 		for(j = LeftRaqY; j < LeftRaqY + 15; j++)
@@ -119,7 +132,7 @@ void FuncionTarea1(){
 		}
 	}
 	
-	//Right
+	//RightRaq
 	for (i = RightRaqX ; i < RightRaqX + 3; i++)
 	{
 		for(j = RightRaqY; j < RightRaqY +15; j++)
@@ -127,24 +140,71 @@ void FuncionTarea1(){
 			LCD1_PutPixel(i,j,TRUE);
 		}
 	}
-
 	LCD1_UpdateFull();
 	
 	while(1){
+		punt2=0;
+		punt1=0;
 		bandera_x = ball_x;
 		bandera_y = ball_y;
 		
 		//Verificación
+			//Lower side & Upper side
 		if(ball_y == 2 || ball_y == V-6)
 		{
 			dy *= -1;
 		}
-		
-		if(ball_x == 2 || ball_x == H-6)
+			
+		if(ball_x == 2 )
 		{
+			count_1++;
 			dx *= -1;
+			jugador1++;
+			punt1 = IntToChar1(jugador1);
+			
+			LCD1_PrintString(1,80,&punt1);
+			LCD1_PrintString(1,50,&punt2);
+			LCD1_PutPixel(bandera_x,bandera_y,FALSE);
+			LCD1_PutPixel(bandera_x,bandera_y+1,FALSE);
+			LCD1_PutPixel(bandera_x,bandera_y+2,FALSE);
+			LCD1_PutPixel(bandera_x,bandera_y,FALSE);
+			LCD1_PutPixel(bandera_x+1,bandera_y,FALSE);
+			LCD1_PutPixel(bandera_x+2,bandera_y,FALSE);
+			
+			LCD1_PutPixel(bandera_x+1,bandera_y+1,FALSE);
+			LCD1_PutPixel(bandera_x+2,bandera_y+1,FALSE);
+			LCD1_PutPixel(bandera_x+1,bandera_y+2,FALSE);
+			LCD1_PutPixel(bandera_x+2,bandera_y+2,FALSE);
+			LCD1_UpdateRegion(bandera_x,bandera_y,4,4);
+			ball_x = 64;
+			ball_y = 32;
+			
+			
+		}else if(ball_x == H-6)
+		{
+			count_2++;
+			dx *= -1;
+			jugador2++;
+			punt2 = IntToChar2(jugador2);
+			
+			LCD1_PrintString(1,50,&punt2);
+			LCD1_PutPixel(bandera_x,bandera_y,FALSE);
+			LCD1_PutPixel(bandera_x,bandera_y+1,FALSE);
+			LCD1_PutPixel(bandera_x,bandera_y+2,FALSE);
+			LCD1_PutPixel(bandera_x,bandera_y,FALSE);
+			LCD1_PutPixel(bandera_x+1,bandera_y,FALSE);
+			LCD1_PutPixel(bandera_x+2,bandera_y,FALSE);
+			
+			LCD1_PutPixel(bandera_x+1,bandera_y+1,FALSE);
+			LCD1_PutPixel(bandera_x+2,bandera_y+1,FALSE);
+			LCD1_PutPixel(bandera_x+1,bandera_y+2,FALSE);
+			LCD1_PutPixel(bandera_x+2,bandera_y+2,FALSE);
+			LCD1_UpdateRegion(bandera_x,bandera_y,4,4);
+			ball_x = 64;
+			ball_y = 32;
+			
 		}
-		
+			//LeftRaq
 		if(ball_x == LeftRaqX + 3)
 		{
 			if((ball_y + 1) >= LeftRaqY && (ball_y+1) < (LeftRaqY + 8))
@@ -163,14 +223,23 @@ void FuncionTarea1(){
 			}
 		}
 		
-		if(ball_x == RightRaqX - 3)
+			//RightRaq
+		if(RightRaqX == (ball_x+3))
 		{
-			if(ball_y >= RightRaqY && ball_y < (RightRaqY + 15))
+			if((ball_y+1) >= RightRaqY && (ball_y+1) < (RightRaqY + 8))
 			{
-				dx *= -1;
+				dx = -1;
+				dy = -1;
+			}else if((ball_y+1) == (RightRaqY + 8))
+			{
+				dx = -1;
+				dy = 0;
+			}else if((ball_y+1) >= (RightRaqY + 9) && (ball_y+1) < RightRaqY + 15)
+			{
+				dx = -1;
+				dy = 1;
 			}
-		}
-		
+		}		
 		
 		//Modificación
 		ball_x += (dx);
@@ -192,6 +261,7 @@ void FuncionTarea1(){
 				}
 				
 			}
+			LCD1_UpdateRegion(ball_x,ball_y,4,4);
 		}else if(dx == -1 && dy == 1)
 		{
 			for(i = ball_x; i<=(bandera_x+2); i++)
@@ -206,6 +276,7 @@ void FuncionTarea1(){
 					}
 				}
 			}
+			LCD1_UpdateRegion(ball_x,bandera_y,4,4);
 		}else if(dx == 1 && dy == 1)
 		{
 			for(i = bandera_x; i<=(ball_x+2); i++)
@@ -220,6 +291,7 @@ void FuncionTarea1(){
 					}
 				}
 			}
+			LCD1_UpdateRegion(bandera_x,bandera_y,4,4);
 		}else if(dx == 1 && dy == -1 )
 		{
 			for(i = bandera_x; i<=(ball_x+2); i++)
@@ -235,6 +307,7 @@ void FuncionTarea1(){
 					}
 				}
 			}
+			LCD1_UpdateRegion(bandera_x,ball_y,4,4);
 		}else if(dx == 1 && dy == 0)
 		{
 			for(i = bandera_x; i<=(ball_x+2); i++)
@@ -250,6 +323,7 @@ void FuncionTarea1(){
 					}
 				}
 			}
+			LCD1_UpdateRegion(bandera_x,ball_y,4,4);
 		}else if(dx == -1 && dy == 0)
 		{
 			for(i = ball_x; i<=(bandera_x+2); i++)
@@ -265,10 +339,12 @@ void FuncionTarea1(){
 					}
 				}
 			}
+			LCD1_UpdateRegion(ball_x,ball_y,4,4);
+		
 		}
-	LCD1_UpdateFull();
 	}
 }
+
 
 
 	
